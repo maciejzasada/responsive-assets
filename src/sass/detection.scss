@@ -1,0 +1,53 @@
+/**
+ * @author Maciej Zasada maciejzsd@gmail.com
+ */
+
+@mixin mobile {
+
+  @media only screen and (max-width: 640px) {
+
+    @content;
+
+  }
+
+}
+
+@mixin tablet {
+
+  @media only screen and (min-width: 641px) and (max-width: 1023px) {
+
+    @content;
+
+  }
+
+}
+
+@mixin desktop {
+
+  @media only screen and (min-width: 1024px) {
+
+    @content;
+
+  }
+
+}
+
+@mixin large {
+
+  @media only screen and (min-width : 1824px) {
+
+    @content;
+
+  }
+
+}
+
+@mixin retina {
+
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+
+    @content;
+
+  }
+
+}
