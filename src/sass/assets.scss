@@ -10,10 +10,10 @@ $image: 'image';
 $desktop: 'desktop';
 $tablet: 'tablet';
 $mobile: 'mobile';
-$x1: 'x1';
-$x2: 'x2';
+$x1: '1x';
+$x2: '2x';
 
-$packages: 'ui';
+$packages: 'package1', 'package2';
 $platforms: $desktop, $tablet, $mobile;
 $resolutions: $x1, $x2;
 $provide-types: $image, $sprite;
@@ -111,11 +111,20 @@ $map-names: ();
 
   @if($resolution == $x2) {
 
-    $original-position: sprite-position($map, $asset-name);
-    $original-width: image-width(sprite-path($map));
-    $original-height: image-height(sprite-path($map));
-    background-position: nth($original-position, 1) * 0.5 nth($original-position, 2) * 0.5;
-    background-size: $original-width * 0.5 $original-height * 0.5;
+    $original-sprite-position: sprite-position($map, $asset-name);
+    $original-sprite-width: image-width(sprite-file($map, $asset-name));
+    $original-sprite-height: image-height(sprite-file($map, $asset-name));
+    $scaled-sprite-width: $original-sprite-width * 0.5;
+    $scaled-sprite-height: $original-sprite-height * 0.5;
+    $original-map-width: image-width(sprite-path($map));
+    $original-map-height: image-height(sprite-path($map));
+    $scaled-map-width: $original-map-width * 0.5;
+    $scaled-map-height: $original-map-height * 0.5;
+
+    width: $scaled-sprite-width;
+    height: $scaled-sprite-height;
+    background-position: nth($original-sprite-position, 1) * 0.5 nth($original-sprite-position, 2) * 0.5;
+    background-size: $scaled-map-width $scaled-map-height;
 
   } @else {
 
