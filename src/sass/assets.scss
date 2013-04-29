@@ -13,7 +13,11 @@ $mobile: 'mobile';
 $x1: '1x';
 $x2: '2x';
 
+<<<<<<< HEAD
 $packages: 'package1', 'package2';
+=======
+$packages-sprite: 'background', 'preloader', 'ui';
+>>>>>>> added .jpg support
 $platforms: $desktop, $tablet, $mobile;
 $resolutions: $x1, $x2;
 $provide-types: $image, $sprite;
@@ -22,7 +26,7 @@ $default-to: $sprite;   // $sprite or $image
 
 /* BEGIN CORE LOGIC */
 @import "compass/utilities/sprites/base";
-@import "detection";
+@import "utils/detection";
 
 $maps: ();
 $map-names: ();
@@ -141,9 +145,9 @@ $map-names: ();
  * @param $resolution resolution type [$x1 | $x2]
  * @param $asset-name asset file name
  */
-@mixin image-with-dimensions($package, $platform, $resolution, $asset-name) {
+@mixin image-with-dimensions($package, $platform, $resolution, $asset-name, $extension: '.png') {
 
-  $url: $images-root + $package + '/' + $platform + '/' + $package + '-' + $platform + '-' + $resolution + '/' + $asset-name + '.png';
+  $url: $images-root + $package + '/' + $platform + '/' + $package + '-' + $platform + '-' + $resolution + '/' + $asset-name + $extension;
 
   background: url($url) no-repeat;
 
@@ -210,23 +214,23 @@ $map-names: ();
  * @param $package package name
  * @param $asset-name asset file name
  */
-@mixin image-responsive($package, $asset-name) {
+@mixin image-responsive($package, $asset-name, $extension: '.png') {
 
-  @include image-with-dimensions($package, $desktop, $x1, $asset-name);
+  @include image-with-dimensions($package, $desktop, $x1, $asset-name, $extension);
 
   @include retina {
 
-    @include image-with-dimensions($package, $desktop, $x2, $asset-name);
+    @include image-with-dimensions($package, $desktop, $x2, $asset-name, $extension);
 
   }
 
   @include tablet {
 
-    @include image-with-dimensions($package, $tablet, $x1, $asset-name);
+    @include image-with-dimensions($package, $tablet, $x1, $asset-name, $extension);
 
     @include retina {
 
-      @include image-with-dimensions($package, $tablet, $x2, $asset-name);
+      @include image-with-dimensions($package, $tablet, $x2, $asset-name, $extension);
 
     }
 
@@ -234,11 +238,11 @@ $map-names: ();
 
   @include mobile {
 
-    @include image-with-dimensions($package, $mobile, $x1, $asset-name);
+    @include image-with-dimensions($package, $mobile, $x1, $asset-name, $extension);
 
     @include retina {
 
-      @include image-with-dimensions($package, $mobile, $x2, $asset-name);
+      @include image-with-dimensions($package, $mobile, $x2, $asset-name, $extension);
 
     }
 
@@ -251,11 +255,11 @@ $map-names: ();
  * @param $package package name
  * @param $asset-name asset file name
  */
-@mixin asset-responsive($package, $asset-name) {
+@mixin asset-responsive($package, $asset-name, $use-sprites: true) {
 
   .#{$asset}.#{$asset-name} {
 
-    @if($default-to == $sprite and supports-type($sprite)) {
+    @if($use-sprites and $default-to == $sprite and supports-type($sprite)) {
 
       @include sprite-responsive($package, $asset-name);
 
@@ -271,11 +275,11 @@ $map-names: ();
 
     } @else {
 
-      @if($default-to == $image and supports-type($image)) {
+      @if($use-sprites == false or ($default-to == $image and supports-type($image))) {
 
-        @include image-responsive($package, $asset-name);
+        @include image-responsive($package, $asset-name, '.jpg');
 
-        @if(supports-type($sprite)) {
+        @if($use-sprites and supports-type($sprite)) {
 
           &.sprite {
 
@@ -296,17 +300,23 @@ $map-names: ();
 /**
  * Generates sprite maps for images found in the project.
  */
-@each $package in $packages {
+@each $package in $packages-sprite {
 
   @each $platform in $platforms {
 
     @each $resolution in $resolutions {
 
       $map-name: $package + '-' + $platform + '-' + $resolution;
-      $url: $package + '/' + $platform + '/' + $map-name + '/*.png';
-      $map: sprite-map($url);
-      $maps: append($maps, $map);
-      $map-names: append($map-names, $map-name);
+      $path: $package + '/' + $platform + '/' + $map-name + '/*.png';
+      $files: listFiles($path, true);
+
+      @if length($files) > 0 {
+
+        $map: sprite-map($path);
+        $maps: append($maps, $map);
+        $map-names: append($map-names, $map-name);
+
+      }
 
     }
 
@@ -315,16 +325,25 @@ $map-names: ();
 }
 
 /**
- * Generates responsive asset classes for all images found in the project.
+ * Generates responsive asset classes for all images found in the project using sprites (and fallback with individual assets).
  */
-@each $package in $packages {
+@each $package in $packages-sprite {
 
-  $path: $package + '/' + nth($platforms, 1) + '/' + $package + '-' + nth($platforms, 1) + '-' + nth($resolutions, 1) + '/*';
-  $assets: listFiles($path, true);
+  $path-png: $package + '/' + nth($platforms, 1) + '/' + $package + '-' + nth($platforms, 1) + '-' + nth($resolutions, 1) + '/*.png';
+  $pngs: listFiles($path-png, true);
 
-  @each $asset in $assets {
+  $path-jpg: $package + '/' + nth($platforms, 1) + '/' + $package + '-' + nth($platforms, 1) + '-' + nth($resolutions, 1) + '/*.jpg';
+  $jpgs: listFiles($path-jpg, true);
+
+  @each $asset in $pngs {
 
     @include asset-responsive($package, $asset);
+
+  }
+
+  @each $asset in $jpgs {
+
+    @include asset-responsive($package, $asset, false);
 
   }
 
