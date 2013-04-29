@@ -13,11 +13,7 @@ $mobile: 'mobile';
 $x1: '1x';
 $x2: '2x';
 
-<<<<<<< HEAD
-$packages: 'package1', 'package2';
-=======
 $packages-sprite: 'background', 'preloader', 'ui';
->>>>>>> added .jpg support
 $platforms: $desktop, $tablet, $mobile;
 $resolutions: $x1, $x2;
 $provide-types: $image, $sprite;
